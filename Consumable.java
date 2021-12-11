@@ -1,12 +1,10 @@
 public abstract class Consumable {
-    protected int x, y;
+    public double nutritiveValue;
+    public int additionalSize;
 
-    public Consumable(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public String toString() {
-        return String.format("(%d, %d):", this.x, this.y);
+    public Consumable(String name, double nutritiveValue, int additionalSize) {
+        super(name);
+        this.nutritiveValue = nutritiveValue;
+        this.additionalSize = additionalSize;
     }
 }

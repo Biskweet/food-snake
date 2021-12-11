@@ -1,15 +1,10 @@
-public class HealthyMeal extends Item {
-    private double valeurNutritive;
-    private int tailleSup;
-    private String nom;
-
-    public HealthyMeal(String nom, double valeurNutritive, int tailleSup) {
-        this.nom = nom;
-        this.valeurNutritive = valeurNutritive;
-        this.tailleSup = tailleSup;
+public class HealthyMeal extends Consumable {
+    public HealthyMeal(String name, double nutritiveValue, int additionalSize) {
+        super(name, nutritiveValue, additionalSize);
     }
 
-    public AlimentSain(String nom) {
-        this(nom, (int) (Math.random() * 6) + 15, (int) (Math.random() * 3) + 1);
+    public HealthyMeal(String name) {
+        this(name, (int) (Math.random() * 6) + 15, (int) (Math.random() * 2) + 1);
+        //           random integer in [15, 20]      random integer in [1, 2]
     }
 }

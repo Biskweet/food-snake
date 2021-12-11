@@ -1,15 +1,14 @@
-public class UnhealthyMeal extends Item implements PasSain {
-	private double valeurNutritive;
-	private int tailleSup;
-	private String nom;
+public class UnhealthyMeal extends Consumable {
+    private double nutritiveValue;
+    private int additionalSize;
 
-	public UnhealthyMeal(String nom, double valeurNutritive, int tailleSup) {
-		this.nom = nom;
-		this.valeurNutritive = valeurNutritive;
-		this.tailleSup = tailleSup;
-	}
+    public UnhealthyMeal(String name, double nutritiveValue, int additionalSize) {
+        super(name, nutritiveValue, additionalSize);
+    }
 
-	public UnhealthyMeal(String nom) {
-		this(nom, (int) (Math.random() * 6) + 15, (int) (Math.random() * 3) + 1);
-	}
+    public UnhealthyMeal(String name) {
+        this(name, (int) (Math.random() * 6) + 10, (int) (Math.random() * 3) + 1);
+        //           random integer in [10, 15]      random integer in [1, 3]
+
+    }
 }
