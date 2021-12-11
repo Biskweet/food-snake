@@ -1,4 +1,4 @@
-public abstract class Consumable {
+public abstract class Consumable extends Cell {
     public double nutritiveValue;
     public int additionalSize;
 
