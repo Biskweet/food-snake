@@ -3,7 +3,6 @@ import java.util.ArrayList;
 public class Engine {
     private static final Engine INSTANCE = new Engine();    
     public static boolean over = false;
-    public static boolean pressing = true;
 
     private Engine() {}
 

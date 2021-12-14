@@ -9,11 +9,11 @@ public class UnhealthyMeal extends Consumable {
     }
 
     public UnhealthyMeal clone() {
-    	try {
-    		return new UnhealthyMeal(this.name, this.nutritiveValue,this.additionalSize, this.x, this.y);
-    	} catch (InvalidNameException error) {
-			System.out.println("Erreur : " + error.getMessage());
-    		return null;
-    	}
+        try {
+            return new UnhealthyMeal(this.name, this.nutritiveValue,this.additionalSize, this.x, this.y);
+        } catch (InvalidNameException error) {
+            System.out.println("Erreur : " + error.getMessage());
+            return null;
+        }
     }
 }

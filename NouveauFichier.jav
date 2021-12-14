@@ -1,5 +1,123 @@
+import java.util.concurrent.TimeUnit;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.awt.Robot;
+
+
+public class AutoKeyPresser {
+    public static void createThread() {
+        Runnable autoPress = new Runnable() {
+            @Override
+            public void run() {
+                Robot autoKey;
+                try {
+                    autoKey = new Robot();
+                } catch (Exception error) {
+                    System.out.println("Error.");
+                    return;
+                }
+
+                while (!Engine.over) {
+                    while (Engine.pressing) {
+                        autoKey.keyPress(KeyEvent.VK_ENTER);
+                        try { TimeUnit.MILLISECONDS.sleep(7); } catch (Exception err) {}
+                    }
+                }
+            }
+        };
+        return new Thread(autoPress);
+    }
+}
+
+
+public class Cell {
+    protected final String name;
+    public boolean isEmpty;
+    public int x, y;
+
+    public Cell(String name, int x, int y) throws InvalidNameException {
+        if (name.length() == 0) { throw new InvalidNameException(); }
+        this.isEmpty = (name == " " ? true : false);
+        this.name = name;
+        this.x = x;
+        this.y = y;
+    }
+
+    public String toString() {
+        return String.format("%s", this.name.charAt(0));  // Return the first character of the name for display
+    }
+}
+
+
+public abstract class Consumable extends Cell {
+    public int nutritiveValue;
+    public int additionalSize;
+
+    public Consumable(String name, int nutritiveValue, int additionalSize, int x, int y) throws InvalidNameException {
+        super(name, x, y);
+        this.nutritiveValue = nutritiveValue;
+        this.additionalSize = additionalSize;
+    }
+}
+
+
+public class Engine {
+    private static final Engine INSTANCE = new Engine();    
+    public static boolean over = false;
+    public static boolean pressing = true;
+
+    private Engine() {}
+
+    public static Engine getInstance() { return INSTANCE; }
+
+    public static void displayWorld(Cell[][] world) {
+        System.out.print("┏"); for (int i = 0; i < world[0].length; i++) { System.out.print("━"); } System.out.println("┓");
+        for (int i = 0; i < world.length; i++) {
+            System.out.print("┃");
+            for (int j = 0; j < world[0].length; j++) {
+                if (world[i][j] instanceof Consumable) {
+                    System.out.print("\u001B[32m\u001B[1m" + world[i][j] + "\u001B[0m");
+                } else {
+                    System.out.print(world[i][j]);
+                }
+            }
+            System.out.print("┃\n");
+        }
+        System.out.print("┗"); for (int i = 0; i < world[0].length; i++) { System.out.print("━"); } System.out.println("┛");
+    }
+
+
+    public static void clearScreen() {
+        System.out.printf("\033[H\033[2J");
+    }
+
+
+    public static void displayBar(int hunger, int maxHunger) {
+        System.out.println("\n\u001B[31m\u001B[1mBarre de faim :");  // "\n" + ANSI_RED + ANSI_BOLD + "Barre de faim :"
+        int rest = maxHunger - hunger;
+        System.out.print("▕");
+        for (int i = 0; i < hunger; i++) {
+            System.out.print("🮋");
+        }
+        for (int i = 0; i < rest; i++) System.out.print("🮀");
+        System.out.print("▏\u001B[0m\n\n");  // "🭰" + ANSI_RESET + "\n\n"
+    }
+
+
+    public static void display(Cell[][] world, int snakeSize, int hunger, int maxHunger) {
+        System.out.println("Aliments sains :\tAliments pas sains :\t\tToxique :");
+        System.out.println("  S : Saumon\t\t  B : Burger\t\t\t  P : Plastique");
+        System.out.println("  E : Épinards\t\t  N : Nutella\t\t");
+        
+        // \n + ANSI_GREEN + ANSI_BOLD + Taille : [taille] + ANSI_RESET
+        System.out.println("\n\u001B[32m\u001B[1mTaille : " + snakeSize + "\u001B[0m"); 
+
+        displayBar(hunger, maxHunger);
+        displayWorld(world);
+    }
+}
+
 
 public class Game {
     private static int SIZE_X = 80;
@@ -78,8 +196,6 @@ public class Game {
             if (hunger > MAX_HUNGER) {
                 hunger = MAX_HUNGER;
             }
-
-            itemPlaceDate = 0;
         }
 
         // Overwriting the snake's tail if there's no size to be added
@@ -127,6 +243,7 @@ public class Game {
 
         // Initializing the first item
         try { item = placeNewItem(world); } catch (InvalidNameException err) { return; } 
+
 
         // ========== Main loop ==========
         while (!Engine.over) {
@@ -180,5 +297,71 @@ public class Game {
         Engine.clearScreen();
         Engine.display(world, snakePosition.size(), hunger, MAX_HUNGER);
         System.out.println("Partie terminée !");
+    }
+}
+
+
+public class HealthyMeal extends Consumable {
+    public HealthyMeal(String name, int nutritiveValue, int additionalSize, int x, int y) throws InvalidNameException {
+        super(name, nutritiveValue, additionalSize, y, y);
+    }
+
+    public HealthyMeal(String name, int x, int y) throws InvalidNameException {
+        this(name, (int) (Math.random() * 11) + 60, (int) (Math.random() * 2) + 4, x, y);
+        //           random integer in [60, 70]      random integer in [4, 5]
+    }
+
+    public UnhealthyMeal clone() {
+        try {
+            return new UnhealthyMeal(this.name, this.nutritiveValue,this.additionalSize, this.x, this.y);
+        } catch (InvalidNameException error) {
+            System.out.println("Erreur : " + error.getMessage());
+            return null;
+        }
+    }
+}
+
+
+public class InvalidNameException extends Exception {
+    public InvalidNameException() {
+        super("Invalid name, must be longer than 0.");
+    }
+}
+
+
+public class Plastic extends Consumable implements Toxique {
+    public Plastic(int x, int y) throws InvalidNameException {
+        super("Plastique", 0, 3, x, y);
+    }
+}
+
+
+public class SnakeBody extends Cell {
+    public SnakeBody(int x, int y) throws InvalidNameException {
+        super("█", x, y);
+    }
+}
+
+
+public interface Toxique {}
+
+
+public class UnhealthyMeal extends Consumable {
+    public UnhealthyMeal(String name, int nutritiveValue, int additionalSize, int x, int y) throws InvalidNameException {
+        super(name, nutritiveValue, additionalSize, x, y);
+    }
+
+    public UnhealthyMeal(String name, int x, int y) throws InvalidNameException {
+        this(name, (int) (Math.random() * 6) + 20, (int) (Math.random() * 3) + 5, x, y);
+        //           random integer in [20, 25]      random integer in [5, 7]
+    }
+
+    public UnhealthyMeal clone() {
+    	try {
+    		return new UnhealthyMeal(this.name, this.nutritiveValue,this.additionalSize, this.x, this.y);
+    	} catch (InvalidNameException error) {
+			System.out.println("Erreur : " + error.getMessage());
+    		return null;
+    	}
     }
 }

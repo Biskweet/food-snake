@@ -8,9 +8,9 @@ public class HealthyMeal extends Consumable {
         //           random integer in [60, 70]      random integer in [4, 5]
     }
 
-    public UnhealthyMeal clone() {
+    public HealthyMeal clone() {
         try {
-            return new UnhealthyMeal(this.name, this.nutritiveValue,this.additionalSize, this.x, this.y);
+            return new HealthyMeal(this.name, this.nutritiveValue,this.additionalSize, this.x, this.y);
         } catch (InvalidNameException error) {
             System.out.println("Erreur : " + error.getMessage());
             return null;

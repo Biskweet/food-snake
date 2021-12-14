@@ -7,4 +7,6 @@ public abstract class Consumable extends Cell {
         this.nutritiveValue = nutritiveValue;
         this.additionalSize = additionalSize;
     }
+
+    public abstract Consumable clone();
 }
