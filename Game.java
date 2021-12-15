@@ -136,7 +136,7 @@ public class Game {
             // If the item expired
             if (System.currentTimeMillis() - itemPlaceDate > 4000) {
                 try {
-                    world[item.y][item.x] = new Cell(" ", item.y, item.x);  // Deleting the old item
+                    world[item.y][item.x] = new Cell(" ", item.x, item.y);  // Deleting the old item
                     item = placeNewItem(world);                             // and creating one elsewhere
                 } catch (InvalidNameException err) { return; }
             }
